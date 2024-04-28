@@ -17,6 +17,7 @@ urlpatterns = [
     path('detalle_evento/eliminarEvento/<int:evento_id>/',views.eliminar_evento,name='eliminar_evento'),
     path('actualizarEvento/', views.actualizar_evento, name='actualizar_evento'),
 
-    
+    #ACCIONES DE REGISTRO DE USUARIO EN EVENTO
+    path('registrar_usuario_evento/', views.registrar_usuario_evento, name='registrar_usuario_evento'),
     
 ]

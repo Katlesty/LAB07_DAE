@@ -28,4 +28,4 @@ class RegistroEvento(models.Model):
     fecha_registro = models.DateTimeField('Fecha de registro', auto_now_add=True)
 
     def __str__(self):
-        return self.usuario + " registrado en  " + self.evento
+        return str(self.usuario) + " registrado en " + str(self.evento)

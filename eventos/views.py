@@ -130,3 +130,20 @@ def eliminar_evento(request, evento_id):
     evento.delete()
     
     return redirect('/eventos/eventos')
+
+@verificar_autenticacion
+def registrar_usuario_evento(request):
+    usuario_id = request.session['usuario_id']
+    usuario = Usuario.objects.get(pk=usuario_id)
+    evento_id = request.POST['evento_id']
+    evento = get_object_or_404(Evento, codigo=evento_id)
+        
+    # Verificar si el usuario ya está registrado para este evento
+    if RegistroEvento.objects.filter(evento=evento, usuario=usuario).exists():
+        messages.error(request, 'Ya estás registrado para este evento.')
+    else:
+    # Si el usuario no está registrado, crear una instancia de RegistroEvento
+        registro = RegistroEvento.objects.create(evento=evento, usuario=usuario)
+        messages.success(request, 'Te has registrado exitosamente para el evento.')
+        
+    return redirect('/eventos/eventos')
