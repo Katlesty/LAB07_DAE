@@ -51,11 +51,17 @@ def evento(request):
     usuario_id = request.session['usuario_id']
     usuario = Usuario.objects.get(pk=usuario_id)
     evento_lista = Evento.objects.all()
+    registro_usuario_evento = RegistroEvento.objects.all()
+
+    for evento in evento_lista:
+        if usuario == evento.encargado:
+            evento.es_encargado = True
+        else:
+            evento.es_encargado = False
+
     context = {
         'evento_lista': evento_lista,
-        'nombre_usuario': usuario.nombre,
-        'apellido_usuario': usuario.apellido,
-        'codigo_usuario': usuario.codigo,
+        'usuario': usuario,
     }
     return render(request, 'eventos.html', context)
 
@@ -68,7 +74,6 @@ def agregar_evento(request):
     hora_evento = request.POST['hora_evento']
     descripcion = request.POST['descripcion']
     
-        
     evento = Evento.objects.create(titulo=titulo, encargado=encargado, imagen=imagen, fecha_evento=fecha_evento, hora_evento=hora_evento, descripcion=descripcion)
         
     return redirect('/eventos/eventos')

@@ -30,8 +30,8 @@
 
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label">Encargado</label>
-                                        <input type="text" class="form-control" name="encargado" value="{{ codigo_usuario }}" readonly hidden>
-                                        <input type="text" class="form-control" value="{{ nombre_usuario }} {{apellido_usuario}}" readonly>
+                                        <input type="text" class="form-control" name="encargado" value="{{ usuario.codigo }}" readonly hidden>
+                                        <input type="text" class="form-control" value="{{ usuario.nombre }} {{ usuario.apellido }}" readonly>
                                     </div>
                                     
                                     <div data-mdb-input-init class="form-outline mb-4">
@@ -111,11 +111,88 @@
                             </a>
                             <div class="card-footer d-flex justify-content-between align-items-center">
                                 <a href="../detalle_evento/{{evento.codigo}}" class="text-decoration-none fw-bold text-light-emphasis">Detalles del evento</a>
-                                <form action="{% url 'eventos:registrar_usuario_evento' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="number" name="evento_id" value="{{ evento.codigo }}" hidden>
-                                    <button type="submit" class="btn btn-info text-white">Registrarse</button>
-                                </form>
+                                {% if evento.es_encargado %}
+                                    <div class="d-flex">
+                                        <button type="button" class="btn btn-info text-white mx-2" data-bs-toggle="modal" data-bs-target="#editarEvento">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="editarEvento" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar evento</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{% url 'eventos:actualizar_evento' %}" method="POST" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <div class="modal-body">
+                                                        <div>
+                                                            <input type="number" name="codigo" value="{{ evento.codigo}}" hidden>
+                    
+                                                            <div data-mdb-input-init class="form-outline mb-4">
+                                                                <label class="form-label">Titulo</label>
+                                                                <input type="titulo" class="form-control" name="titulo" value="{{evento.titulo}}"/>
+                                                            </div>
+                    
+                                                            <div data-mdb-input-init class="form-outline mb-4">
+                                                                <label class="form-label">Encargado</label>
+                                                                <input type="text" class="form-control" name="encargado" value="{{ usuario.codigo }}" readonly hidden>
+                                                                <input type="text" class="form-control" value="{{ usuario.nombre }} {{ usuario.apellido}}" readonly>
+                                                            </div>
+                                                            
+                                                            <div data-mdb-input-init class="form-outline mb-4">
+                                                                <label class="form-label" for="customFile">Imagen </label>  
+                                                                <input type="file" class="form-control" name="imagen" />
+                                                            </div>
+                                        
+                                                            <div class="d-flex">
+                                                                <div data-mdb-input-init class="form-outline mb-4 pe-3">
+                                                                    <label class="form-label">Fecha del evento</label>
+                                                                    <input id="datepicker2" name="fecha_evento" value="{{ evento.fecha_evento|date:'Y-m-d' }}" />
+                                                                        <script>
+                                                                            $('#datepicker2').datepicker({
+                                                                                uiLibrary: 'bootstrap5',
+                                                                                format: 'yyyy-mm-dd'
+                                                                            });
+                                                                        </script>
+                                                                </div>
+                                                                <div data-mdb-input-init class="form-outline mb-4 mt-1 ps-3">
+                                                                    <label class="form-label">Hora del evento</label>
+                                                                    <input id="timepicker2" name="hora_evento" value="{{evento.hora_evento}}" />
+                                                                        <script>
+                                                                            $('#timepicker2').timepicker({
+                                                                                showMeridian: false, 
+                                                                                minuteStep: 1, 
+                                                                            });
+                                                                        </script>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div data-mdb-input-init class="form-outline mb-3">
+                                                                <label class="form-label">Descripcion</label>
+                                                                <textarea class="form-control" rows="3" name="descripcion">{{evento.descripcion}}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-info text-white">Actualizar</button>
+                                                        <button type="button" class="btn " data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal -->
+                                        <a href="../detalle_evento/eliminarEvento/{{evento.codigo}}" class="btn btn-danger text-decoration-none text-white"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                {% else %}
+                                    <form action="{% url 'eventos:registrar_usuario_evento' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="number" name="evento_id" value="{{ evento.codigo }}" hidden>
+                                        <button type="submit" class="btn btn-info text-white">Registrarse</button>
+                                    </form>
+                                {% endif %}
                             </div>
                         </div>
                         </div>
