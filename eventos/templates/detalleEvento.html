@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="text-body-tertiary">{{evento.titulo}}</h1>
+            {% if es_encargado %}
+                <div class="d-flex">
+                    <button type="button" class="btn btn-info text-white mx-2" data-bs-toggle="modal" data-bs-target="#editarEvento">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="editarEvento" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar evento</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{% url 'eventos:actualizar_evento' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div>
+                                        <input type="number" name="codigo" value="{{ evento.codigo}}" hidden>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label">Titulo</label>
+                                            <input type="titulo" class="form-control" name="titulo" value="{{evento.titulo}}"/>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label">Encargado</label>
+                                            <input type="text" class="form-control" name="encargado" value="{{ usuario.codigo }}" readonly hidden>
+                                            <input type="text" class="form-control" value="{{ usuario.nombre}} {{usuario.apellido}}" readonly>
+                                        </div>
+                                        
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="customFile">Imagen </label>  
+                                            <input type="file" class="form-control" name="imagen" />
+                                        </div>
+                    
+                                        <div class="d-flex">
+                                            <div data-mdb-input-init class="form-outline mb-4 pe-3">
+                                                <label class="form-label">Fecha del evento</label>
+                                                <input id="datepicker" name="fecha_evento" value="{{ evento.fecha_evento|date:'Y-m-d' }}" />
+                                                    <script>
+                                                        $('#datepicker').datepicker({
+                                                            uiLibrary: 'bootstrap5',
+                                                            format: 'yyyy-mm-dd'
+                                                        });
+                                                    </script>
+                                            </div>
+                                            <div data-mdb-input-init class="form-outline mb-4 mt-1 ps-3">
+                                                <label class="form-label">Hora del evento</label>
+                                                <input id="timepicker" name="hora_evento" value="{{evento.hora_evento}}" />
+                                                    <script>
+                                                        $('#timepicker').timepicker({
+                                                            showMeridian: false, 
+                                                            minuteStep: 1, 
+                                                        });
+                                                    </script>
+                                            </div>
+                                        </div>
+                                        
+                                        <div data-mdb-input-init class="form-outline mb-3">
+                                            <label class="form-label">Descripcion</label>
+                                            <textarea class="form-control" rows="3" name="descripcion">{{evento.descripcion}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-info text-white">Actualizar</button>
+                                    <button type="button" class="btn " data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <a href="../eliminarEvento/{{evento.codigo}}" class="btn btn-danger text-decoration-none text-white"><i class="fa-solid fa-trash"></i></a>
+                </div>
+            {% endif %}
+        </div>
+        <hr class="border border-secondary">
+        <div>
+            <img class="w-100 mb-1 rounded" src="{{evento.imagen.url}}">
+        </div>
+        <div class="d-flex text-secondary">
+            <p class="pe-3 fs-6"> Fecha: {{evento.fecha_evento}}</p>
+            <p class="pe-3 fs-6"> Hora: {{evento.hora_evento}}</p>
+        </div>
+        <div>
+            <p>{{evento.descripcion}}</p>
+        </div>
+        <div>
+            <h4 class="text-secondary">USUARIOS REGISTRADOS</h4>
+            <hr>
+        </div>
+    </div>
+{% endblock %}

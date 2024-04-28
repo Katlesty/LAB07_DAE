@@ -1,0 +1,42 @@
+{% extends "layout-before.html" %}
+{% block content %}
+    {% load static %}
+    <section class="vh-100">
+        <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-9 col-lg-6 col-xl-5">
+            <img src="{% static 'images/undraw_mobile_login_re_9ntv.svg' %}" class="img-fluid" alt="Sample image">
+            </div>
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                <form action="{% url 'eventos:iniciarsesion' %}" method="post">
+                    {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>¡Lo sentimos!</strong> {{message}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control form-control-lg" name="email" />
+                    </div>
+        
+                    <div data-mdb-input-init class="form-outline mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="contraseña" class="form-control form-control-lg"/>
+                    </div>
+        
+                    <div class="mt-4 pt-2">
+                        <button type="submit" class="btn btn-info btn-lg text-white">Iniciar sesión</button>
+                        <p class="small fw-bold mt-2 pt-1 mb-0">¿No tienes una cuenta? <a href="{% url 'eventos:registrar' %}" class="link-info">Registrar</a></p>
+                    </div>
+        
+                </form>
+            </div>
+        </div>
+        </div>
+        
+    </section>
+{% endblock %}
