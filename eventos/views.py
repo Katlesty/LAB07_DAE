@@ -7,6 +7,14 @@ from datetime import datetime
 from django.db.models import Count
 
 def index(request):
+    if 'usuario_id' in request.session:
+        # Si el usuario está autenticado, puedes obtener más información del usuario si es necesario
+        usuario_id = request.session['usuario_id']
+        try:
+            usuario = Usuario.objects.get(pk=usuario_id)
+            # Hacer algo con los datos del usuario si es necesario
+        except Usuario.DoesNotExist:
+            pass
     return render(request, 'index.html')
 
 #ACCIONES USUARIO
