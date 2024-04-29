@@ -11,7 +11,7 @@ def index(request):
     if 'usuario_id' in request.session:
         usuario_id = request.session['usuario_id']
         try:
-            usuario = Usuario.objects.get(pk=usuario_id)
+            usuario = Usuario.objects.get(codigo=usuario_id)
         except Usuario.DoesNotExist:
             pass
     return render(request, 'index.html')
