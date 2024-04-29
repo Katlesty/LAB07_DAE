@@ -20,18 +20,22 @@ def index(request):
 #ACCIONES USUARIO
 
 def signup(request):
-    nombre = request.POST.get('nombre')
-    apellido = request.POST.get('apellido')
-    email = request.POST.get('email')
-    contraseña = request.POST.get('contraseña')
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '')
+        apellido = request.POST.get('apellido', '')
+        email = request.POST.get('email', '')
+        contraseña = request.POST.get('contraseña', '')
         
-    if Usuario.objects.filter(email=email).exists():
-        messages.error(request, 'El usuario con este correo electrónico ya existe.')
-        return render(request,'register.html')
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, 'El usuario con este correo electrónico ya existe.')
+            return render(request, 'register.html')
         
-    Usuario.objects.create(nombre=nombre, apellido=apellido, email=email, contraseña=contraseña)
+        Usuario.objects.create(nombre=nombre, apellido=apellido, email=email, contraseña=contraseña)
         
-    return redirect('/eventos/iniciarsesion')
+        return redirect('/eventos/iniciarsesion')
+    else:
+        return render(request, 'register.html')
+
 
 def login(request):
     
