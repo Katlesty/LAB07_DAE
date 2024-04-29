@@ -7,12 +7,11 @@ from datetime import datetime
 from django.db.models import Count
 
 def index(request):
+    
     if 'usuario_id' in request.session:
-        # Si el usuario está autenticado, puedes obtener más información del usuario si es necesario
         usuario_id = request.session['usuario_id']
         try:
             usuario = Usuario.objects.get(pk=usuario_id)
-            # Hacer algo con los datos del usuario si es necesario
         except Usuario.DoesNotExist:
             pass
     return render(request, 'index.html')
@@ -21,10 +20,10 @@ def index(request):
 
 def signup(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre', '')
-        apellido = request.POST.get('apellido', '')
-        email = request.POST.get('email', '')
-        contraseña = request.POST.get('contraseña', '')
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        email = request.POST.get('email')
+        contraseña = request.POST.get('contraseña')
         
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, 'El usuario con este correo electrónico ya existe.')
