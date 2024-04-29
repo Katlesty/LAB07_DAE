@@ -145,36 +145,33 @@ def detalle_evento(request, evento_codigo):
 
 @verificar_autenticacion
 def actualizar_evento(request):
-    if request.method == 'POST':
-        codigo = request.POST.get('codigo')
-        titulo = request.POST['titulo']
-        encargado_id = request.POST['encargado']
-        encargado = Usuario.objects.get(codigo=encargado_id)
+    codigo = request.POST.get('codigo')
+    titulo = request.POST['titulo']
+    encargado_id = request.POST['encargado']
+    encargado = Usuario.objects.get(codigo=encargado_id)
 
-        if 'imagen' in request.FILES:
-            imagen = request.FILES['imagen']
-        else:
-            evento = Evento.objects.get(codigo=codigo)
-            imagen = evento.imagen  
-
-        fecha_evento = request.POST['fecha_evento']
-        hora_evento = request.POST['hora_evento']
-        descripcion = request.POST['descripcion']
-
-        evento = Evento.objects.get(codigo=codigo)
-
-        evento.titulo = titulo
-        evento.encargado = encargado
-        evento.imagen = imagen
-        evento.fecha_evento = fecha_evento
-        evento.hora_evento = hora_evento
-        evento.descripcion = descripcion
-
-        evento.save()
-
-        return redirect('/eventos/detalle_evento/{}/'.format(codigo))
+    if 'imagen' in request.FILES:
+        imagen = request.FILES['imagen']
     else:
-        return redirect('/eventos/detalle_evento/{}/'.format(codigo))
+        evento = Evento.objects.get(codigo=codigo)
+        imagen = evento.imagen  
+
+    fecha_evento = request.POST['fecha_evento']
+    hora_evento = request.POST['hora_evento']
+    descripcion = request.POST['descripcion']
+
+    evento = Evento.objects.get(codigo=codigo)
+
+    evento.titulo = titulo
+    evento.encargado = encargado
+    evento.imagen = imagen
+    evento.fecha_evento = fecha_evento
+    evento.hora_evento = hora_evento
+    evento.descripcion = descripcion
+
+    evento.save()
+
+    return redirect('/eventos/detalle_evento/{}/'.format(codigo))
 
 @verificar_autenticacion 
 def eliminar_evento(request, evento_codigo):
@@ -203,36 +200,33 @@ def mis_eventos(request):
 
 @verificar_autenticacion
 def actualizar_mi_evento(request):
-    if request.method == 'POST':
-        codigo = request.POST.get('codigo')
-        titulo = request.POST['titulo']
-        encargado_id = request.POST['encargado']
-        encargado = Usuario.objects.get(codigo=encargado_id)
+    codigo = request.POST.get('codigo')
+    titulo = request.POST['titulo']
+    encargado_id = request.POST['encargado']
+    encargado = Usuario.objects.get(codigo=encargado_id)
 
-        if 'imagen' in request.FILES:
-            imagen = request.FILES['imagen']
-        else:
-            evento = Evento.objects.get(codigo=codigo)
-            imagen = evento.imagen  
-
-        fecha_evento = request.POST['fecha_evento']
-        hora_evento = request.POST['hora_evento']
-        descripcion = request.POST['descripcion']
-
-        evento = Evento.objects.get(codigo=codigo)
-
-        evento.titulo = titulo
-        evento.encargado = encargado
-        evento.imagen = imagen
-        evento.fecha_evento = fecha_evento
-        evento.hora_evento = hora_evento
-        evento.descripcion = descripcion
-
-        evento.save()
-
-        return redirect('/eventos/miseventos/')
+    if 'imagen' in request.FILES:
+        imagen = request.FILES['imagen']
     else:
-        return redirect('/eventos/miseventos')
+        evento = Evento.objects.get(codigo=codigo)
+        imagen = evento.imagen  
+
+    fecha_evento = request.POST['fecha_evento']
+    hora_evento = request.POST['hora_evento']
+    descripcion = request.POST['descripcion']
+
+    evento = Evento.objects.get(codigo=codigo)
+
+    evento.titulo = titulo
+    evento.encargado = encargado
+    evento.imagen = imagen
+    evento.fecha_evento = fecha_evento
+    evento.hora_evento = hora_evento
+    evento.descripcion = descripcion
+
+    evento.save()
+
+    return redirect('/eventos/miseventos/')
 
 @verificar_autenticacion 
 def eliminar_mi_evento(request, evento_codigo):
