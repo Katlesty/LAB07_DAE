@@ -259,8 +259,13 @@ def agregar_usuario_evento(request):
         
     evento = Evento.objects.get(codigo=evento_codigo)
     usuario = Usuario.objects.get(codigo=usuario_codigo)
-        
-    RegistroEvento.objects.create(evento=evento, usuario=usuario)
+    
+    if RegistroEvento.objects.filter(evento=evento, usuario=usuario).exists():
+        messages.error(request, 'El usuario ya está registrado en este evento.')
+    else:
+        RegistroEvento.objects.create(evento=evento, usuario=usuario)
+        messages.success(request, 'Se ha registrado al usuario exitosamente.')
+         
         
     return redirect('/eventos/detalle_evento/{}/'.format(evento_codigo)) 
 
