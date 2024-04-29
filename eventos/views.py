@@ -59,6 +59,7 @@ def cerrar_sesion(request):
         del request.session['usuario_id']
     return redirect('/eventos/iniciarsesion/')
 
+
 #ACCIONES EVENTO
 
 @verificar_autenticacion
@@ -186,15 +187,56 @@ def mis_eventos(request):
 
     eventos_usuario = Evento.objects.filter(encargado=usuario)
 
-    # Consulta para obtener la cantidad de eventos realizados por el usuario
+    #CONSULTA AVANZADA (CANTIDAD DE EVENTOS ORGANIZADOS)
     cantidad_eventos_usuario = eventos_usuario.count()
-
+    #CONSULTA AVANZADA (CANTIDAD DE EVENTOS ORGANIZADOS)
+    
     context = {
         'eventos_usuario': eventos_usuario,
         'usuario': usuario,
-        'cantidad_eventos_usuario': cantidad_eventos_usuario,  # Cantidad de eventos realizados por el usuario
+        'cantidad_eventos_usuario': cantidad_eventos_usuario,
     }
-    return render(request, 'mis_eventos.html', context)
+    return render(request, 'misEventos.html', context)
+
+@verificar_autenticacion
+def actualizar_mi_evento(request):
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo')
+        titulo = request.POST['titulo']
+        encargado_id = request.POST['encargado']
+        encargado = Usuario.objects.get(codigo=encargado_id)
+
+        if 'imagen' in request.FILES:
+            imagen = request.FILES['imagen']
+        else:
+            evento = Evento.objects.get(codigo=codigo)
+            imagen = evento.imagen  
+
+        fecha_evento = request.POST['fecha_evento']
+        hora_evento = request.POST['hora_evento']
+        descripcion = request.POST['descripcion']
+
+        evento = Evento.objects.get(codigo=codigo)
+
+        evento.titulo = titulo
+        evento.encargado = encargado
+        evento.imagen = imagen
+        evento.fecha_evento = fecha_evento
+        evento.hora_evento = hora_evento
+        evento.descripcion = descripcion
+
+        evento.save()
+
+        return redirect('/eventos/miseventos/')
+    else:
+        return redirect('/eventos/miseventos')
+
+@verificar_autenticacion 
+def eliminar_mi_evento(request, evento_codigo):
+    evento = Evento.objects.get(codigo=evento_codigo)
+    evento.delete()
+    
+    return redirect('/eventos/miseventos/')
 
 #REGISTRAR USUARIOS EN EVENTOS 
 
@@ -233,5 +275,3 @@ def eliminar_usuario_evento(request,usuario_codigo,evento_codigo):
     registro_evento.delete()
         
     return redirect('/eventos/detalle_evento/{}'.format(evento_codigo))  
-
-#BUSQUEDA

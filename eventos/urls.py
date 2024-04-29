@@ -14,6 +14,10 @@ urlpatterns = [
     
     #ACCIONES DE EVENTO
     path('eventos/',views.evento,name='eventos'),
+    path('miseventos/', views.mis_eventos, name='mis_eventos'),
+    path('actualizarMiEvento/', views.actualizar_mi_evento, name='actualizar_mi_evento'),
+    path('detalle_evento/eliminarMiEvento/<int:evento_codigo>/',views.eliminar_mi_evento,name='eliminar_mi_evento'),
+     
     path('detalle_evento/<int:evento_codigo>/',views.detalle_evento,name='detalle_evento'),
     path('agregarEvento/',views.agregar_evento,name='agregar_evento'),
     path('detalle_evento/eliminarEvento/<int:evento_codigo>/',views.eliminar_evento,name='eliminar_evento'),

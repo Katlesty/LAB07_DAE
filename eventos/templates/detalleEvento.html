@@ -98,12 +98,6 @@
                 <div class="table-wrapper">
                     <div class="table-title">
                         <div class="d-flex justify-content-between">
-                            <div class="col-sm-6">
-                                <form class="d-flex" action="" method="post">
-                                    <input class="form-control me-2" type="search" name="usuario" placeholder="Nombre o apellido del usuario">
-                                    <button class="btn btn-info text-white" type="submit">Buscar</button>
-                                </form>
-                            </div>
                             {% if es_encargado %}
                             <div class="">
                                 <button type="button" class="btn btn-secondary text-white mx-2 " data-bs-toggle="modal" data-bs-target="#agregarUsuario">
@@ -157,6 +151,7 @@
                                 <th>Nombre(s)</th>
                                 <th>Apellido(s)</th>
                                 <th>Correo electrónico</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody >
