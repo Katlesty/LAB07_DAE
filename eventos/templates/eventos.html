@@ -1,9 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class=" ">
+        <div class="bg-light p-4">
+            <div class="container pt-4 d-flex align-items-center ">
+                <h5 class="me-3">EVENTOS EN ESTE MES:</h5> 
+                <h6 class="bg-info px-2 py-1 text-white rounded-circle">{{ cantidad_eventos_mes_actual }}</h6>
+            </div>
+            <div class="container pt-2 d-flex align-items-center ">
+                <table class="my-3 table">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Nombre(s)</th>
+                            <th>Apellido(s)</th>
+                            <th>Correo electrónico</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {% for usuario_mas_registrado in usuarios_mas_registrados %}
+                        <tr>
+                            <td>{{ usuario_mas_registrado.nombre }}</td>
+                            <td>{{ usuario_mas_registrado.apellido }}</td>
+                            <td>{{ usuario_mas_registrado.email }}</td>
+                            <td>{{ usuario_mas_registrado.num_registros }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div class="container py-4 d-flex justify-content-between">
             <form class="d-flex" action="" method="post">
-                <input class="form-control me-2" type="search" name="busqueda">
+                <input class="form-control me-2" type="search" name="evento_nombre" placeholder="Nombre del evento">
                 <button class="btn btn-info text-white" type="submit">Buscar</button>
             </form>
             <div class="">
@@ -91,7 +119,7 @@
                 {% endfor %}
             {% endif %}
 
-            <h2 class="border-bottom mb-5 text-center text-secondary">Eventos</h2>
+            <h2 class="border-bottom mb-5 text-center text-secondary">Eventos</p></h2>
             <div class="py-3">
                 <div class="container">
                   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">

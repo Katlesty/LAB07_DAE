@@ -2,57 +2,76 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .models import Usuario,Evento,RegistroEvento
 from django.contrib import messages
 from .decorators import verificar_autenticacion
+import calendar
+from datetime import datetime
+from django.db.models import Count
 
 def index(request):
     return render(request, 'index.html')
 
+#ACCIONES USUARIO
+
 def signup(request):
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
-        email = request.POST.get('email')
-        contraseña = request.POST.get('contraseña')
+    nombre = request.POST.get('nombre')
+    apellido = request.POST.get('apellido')
+    email = request.POST.get('email')
+    contraseña = request.POST.get('contraseña')
         
-        if Usuario.objects.filter(email=email).exists():
-            messages.error(request, 'El usuario con este correo electrónico ya existe.')
-            return render(request,'register.html')
-        
-        usuario = Usuario.objects.create(nombre=nombre, apellido=apellido, email=email, contraseña=contraseña)
-        
-        return redirect('/eventos/iniciarsesion')
-    else:
-        
+    if Usuario.objects.filter(email=email).exists():
+        messages.error(request, 'El usuario con este correo electrónico ya existe.')
         return render(request,'register.html')
+        
+    Usuario.objects.create(nombre=nombre, apellido=apellido, email=email, contraseña=contraseña)
+        
+    return redirect('/eventos/iniciarsesion')
 
 def login(request):
     
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        contraseña = request.POST.get('contraseña')
+    email = request.POST.get('email')
+    contraseña = request.POST.get('contraseña')
         
-        if Usuario.objects.filter(email=email).exists():
-            usuario = Usuario.objects.get(email=email)
-            if usuario.contraseña == contraseña:
-                request.session['usuario_id'] = usuario.codigo  
-                return redirect('/eventos/eventos')
-            else:
-                messages.error(request, 'Contraseña incorrecta.')
-                return render(request, 'login.html')
-            
+    if Usuario.objects.filter(email=email).exists():
+        usuario = Usuario.objects.get(email=email)
+        if usuario.contraseña == contraseña:
+            request.session['usuario_id'] = usuario.codigo  
+            return redirect('/eventos/eventos')
         else:
-            if Usuario.DoesNotExist:
-                messages.error(request, 'La cuenta no existe.')
-                return render(request, 'login.html')
+            messages.error(request, 'Contraseña incorrecta.')
+            return render(request, 'login.html')
+            
+    else:
+        if Usuario.DoesNotExist:
+            messages.error(request, 'La cuenta no existe.')
+            return render(request, 'login.html')
 
     return render(request, 'login.html')
+
+def cerrar_sesion(request):
+    if 'usuario_id' in request.session:
+        del request.session['usuario_id']
+    return redirect('/eventos/iniciarsesion/')
+
+#ACCIONES EVENTO
 
 @verificar_autenticacion
 def evento(request):
     usuario_id = request.session['usuario_id']
-    usuario = Usuario.objects.get(pk=usuario_id)
+    usuario = Usuario.objects.get(codigo=usuario_id)
     evento_lista = Evento.objects.all()
-    registro_usuario_evento = RegistroEvento.objects.all()
+    
+    #CONSULTA AVANZADA (CANTIDAD DE EVENTOS EN EL MES)
+    actual = datetime.now()
+    primer_dia_mes_actual = datetime(actual.year, actual.month, 1)
+    ultimo_dia_mes_actual = datetime(actual.year, actual.month, calendar.monthrange(actual.year, actual.month)[1])
 
+    eventos_mes_actual = Evento.objects.filter(fecha_evento__gte=primer_dia_mes_actual, fecha_evento__lte=ultimo_dia_mes_actual)
+    cantidad_eventos_mes_actual = eventos_mes_actual.count()
+    #CONSULTA AVANZADA (CANTIDAD DE EVENTOS EN EL MES)
+    
+    #CONSULTA AVANZADA (USUARIOS CON MAYOR PARTICIPACION)
+    usuarios_mas_registrados = Usuario.objects.annotate(num_registros=Count('registroevento')).order_by('-num_registros')
+    #CONSULTA AVANZADA (USUARIO CON MAYOR PARTICIPACION)
+    
     for evento in evento_lista:
         if usuario == evento.encargado:
             evento.es_encargado = True
@@ -62,9 +81,12 @@ def evento(request):
     context = {
         'evento_lista': evento_lista,
         'usuario': usuario,
+        'cantidad_eventos_mes_actual': cantidad_eventos_mes_actual,
+        'usuarios_mas_registrados': usuarios_mas_registrados,
     }
     return render(request, 'eventos.html', context)
 
+@verificar_autenticacion
 def agregar_evento(request):
     titulo = request.POST['titulo']
     encargado_id = request.POST['encargado']  
@@ -74,16 +96,25 @@ def agregar_evento(request):
     hora_evento = request.POST['hora_evento']
     descripcion = request.POST['descripcion']
     
-    evento = Evento.objects.create(titulo=titulo, encargado=encargado, imagen=imagen, fecha_evento=fecha_evento, hora_evento=hora_evento, descripcion=descripcion)
+    Evento.objects.create(titulo=titulo, encargado=encargado, imagen=imagen, fecha_evento=fecha_evento, hora_evento=hora_evento, descripcion=descripcion)
         
     return redirect('/eventos/eventos')
 
 @verificar_autenticacion
-def detalle_evento(request, evento_id):
+def detalle_evento(request, evento_codigo):
     usuario_id = request.session['usuario_id']
     usuario = Usuario.objects.get(codigo=usuario_id)
-    evento = get_object_or_404(Evento, codigo=evento_id)
-
+    evento = get_object_or_404(Evento, codigo=evento_codigo)
+    usuario_lista = Usuario.objects.all()
+    
+    registros_evento = RegistroEvento.objects.filter(evento=evento)
+    
+    usuarios_registrados = [registro.usuario for registro in registros_evento]
+    
+    #CONSULTA AVANZADA (CANTIDAD DE USUARIOS REGISTRADOS EN EL EVENTO)
+    cantidad_usuarios_registrados = len(usuarios_registrados)
+    #CONSULTA AVANZADA (CANTIDAD DE USUARIOS REGISTRADOS EN EL EVENTO)
+    
     if usuario == evento.encargado:
         es_encargado = True
     else:
@@ -93,10 +124,14 @@ def detalle_evento(request, evento_id):
         'evento': evento,
         'es_encargado': es_encargado,
         'usuario': usuario,
+        'usuario_lista':usuario_lista,
+        'usuarios_registrados': usuarios_registrados,
+        'cantidad_usuarios_registrados': cantidad_usuarios_registrados,
     }
     
     return render(request, 'detalleEvento.html', context)
 
+@verificar_autenticacion
 def actualizar_evento(request):
     if request.method == 'POST':
         codigo = request.POST.get('codigo')
@@ -104,12 +139,11 @@ def actualizar_evento(request):
         encargado_id = request.POST['encargado']
         encargado = Usuario.objects.get(codigo=encargado_id)
 
-        # Verifica si se proporciona una nueva imagen
         if 'imagen' in request.FILES:
             imagen = request.FILES['imagen']
         else:
             evento = Evento.objects.get(codigo=codigo)
-            imagen = evento.imagen  # Mantén la imagen existente
+            imagen = evento.imagen  
 
         fecha_evento = request.POST['fecha_evento']
         hora_evento = request.POST['hora_evento']
@@ -129,26 +163,67 @@ def actualizar_evento(request):
         return redirect('/eventos/detalle_evento/{}/'.format(codigo))
     else:
         return redirect('/eventos/detalle_evento/{}/'.format(codigo))
-    
-def eliminar_evento(request, evento_id):
-    evento = Evento.objects.get(codigo=evento_id)
+
+@verificar_autenticacion 
+def eliminar_evento(request, evento_codigo):
+    evento = Evento.objects.get(codigo=evento_codigo)
     evento.delete()
     
     return redirect('/eventos/eventos')
 
 @verificar_autenticacion
+def mis_eventos(request):
+    usuario_id = request.session['usuario_id']
+    usuario = Usuario.objects.get(codigo=usuario_id)
+
+    eventos_usuario = Evento.objects.filter(encargado=usuario)
+
+    # Consulta para obtener la cantidad de eventos realizados por el usuario
+    cantidad_eventos_usuario = eventos_usuario.count()
+
+    context = {
+        'eventos_usuario': eventos_usuario,
+        'usuario': usuario,
+        'cantidad_eventos_usuario': cantidad_eventos_usuario,  # Cantidad de eventos realizados por el usuario
+    }
+    return render(request, 'mis_eventos.html', context)
+
+#REGISTRAR USUARIOS EN EVENTOS 
+
+@verificar_autenticacion
 def registrar_usuario_evento(request):
     usuario_id = request.session['usuario_id']
-    usuario = Usuario.objects.get(pk=usuario_id)
+    usuario = Usuario.objects.get(codigo=usuario_id)
     evento_id = request.POST['evento_id']
     evento = get_object_or_404(Evento, codigo=evento_id)
         
-    # Verificar si el usuario ya está registrado para este evento
     if RegistroEvento.objects.filter(evento=evento, usuario=usuario).exists():
         messages.error(request, 'Ya estás registrado para este evento.')
     else:
-    # Si el usuario no está registrado, crear una instancia de RegistroEvento
-        registro = RegistroEvento.objects.create(evento=evento, usuario=usuario)
+        RegistroEvento.objects.create(evento=evento, usuario=usuario)
         messages.success(request, 'Te has registrado exitosamente para el evento.')
         
     return redirect('/eventos/eventos')
+
+@verificar_autenticacion
+def agregar_usuario_evento(request):
+    evento_codigo = request.POST.get('codigo')
+    usuario_codigo = request.POST.get('usuario_codigo')  
+        
+    evento = Evento.objects.get(codigo=evento_codigo)
+    usuario = Usuario.objects.get(codigo=usuario_codigo)
+        
+    RegistroEvento.objects.create(evento=evento, usuario=usuario)
+        
+    return redirect('/eventos/detalle_evento/{}/'.format(evento_codigo)) 
+
+@verificar_autenticacion
+def eliminar_usuario_evento(request,usuario_codigo,evento_codigo):
+    
+    registro_evento = RegistroEvento.objects.get(evento=evento_codigo, usuario=usuario_codigo)
+    
+    registro_evento.delete()
+        
+    return redirect('/eventos/detalle_evento/{}'.format(evento_codigo))  
+
+#BUSQUEDA

@@ -18,3 +18,8 @@ height: calc(100% - 73px);
 height: 100%;
 }
 }
+
+.custom-select-height {
+    max-height: 200px; /* Ajusta esta altura según tus necesidades */
+    overflow-y: auto; /* Esto hace que aparezca la barra de desplazamiento vertical */
+}

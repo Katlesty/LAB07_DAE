@@ -92,8 +92,92 @@
             <p>{{evento.descripcion}}</p>
         </div>
         <div>
-            <h4 class="text-secondary">USUARIOS REGISTRADOS</h4>
+            <h4 class="text-secondary">USUARIOS REGISTRADOS ({{ cantidad_usuarios_registrados }})</h4> 
             <hr>
+            <div class="container">
+                <div class="table-wrapper">
+                    <div class="table-title">
+                        <div class="d-flex justify-content-between">
+                            <div class="col-sm-6">
+                                <form class="d-flex" action="" method="post">
+                                    <input class="form-control me-2" type="search" name="usuario" placeholder="Nombre o apellido del usuario">
+                                    <button class="btn btn-info text-white" type="submit">Buscar</button>
+                                </form>
+                            </div>
+                            {% if es_encargado %}
+                            <div class="">
+                                <button type="button" class="btn btn-secondary text-white mx-2 " data-bs-toggle="modal" data-bs-target="#agregarUsuario">
+                                    <i class="fa-solid fa-user-plus"></i><span> Agregar usuario</span>
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="agregarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar evento</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{% url 'eventos:agregar_usuario_evento' %}" method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div class="modal-body">
+                                                <div>
+                                                    <input type="number" name="codigo" value="{{ evento.codigo}}" hidden>
+            
+                                                    <div data-mdb-input-init class="form-outline mb-4">
+                                                        <label class="form-label">Evento</label>
+                                                        <input type="titulo" class="form-control" name="titulo" value="{{evento.titulo}}"/>
+                                                    </div>
+            
+                                                    <div class="form-outline mb-4">
+                                                        <label class="form-label">Usuario</label>
+                                                        <select class="form-select selectpicker" name='usuario_codigo' data-size="5">
+                                                            {% for user in usuario_lista %}
+                                                            <option value="{{user.codigo}}">{{user.nombre}} {{user.apellido}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                      </div>                                                    
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-info text-white">Agregar</button>
+                                                <button type="button" class="btn " data-bs-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                <!-- Modal -->						
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <table class="my-3 table">
+                        <thead class="table-info">
+                            <tr>
+                                <th>Nombre(s)</th>
+                                <th>Apellido(s)</th>
+                                <th>Correo electrónico</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            {% for usuario_registrado in usuarios_registrados %}
+                            <tr>
+                                <td>{{ usuario_registrado.nombre }}</td>
+                                <td>{{ usuario_registrado.apellido  }}</td>
+                                <td>{{ usuario_registrado.email }}</td>
+                                <td>
+                                    {% if es_encargado %}
+                                    <a href="../../eliminar_usuario_evento/{{evento.codigo}}/{{usuario_registrado.codigo}}" class="btn btn-danger text-decoration-none text-white" data-toggle="modal"><i class="fa-solid fa-user-minus"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
         </div>
     </div>
 {% endblock %}

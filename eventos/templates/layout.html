@@ -30,7 +30,8 @@
                 <img src="{% static 'images/logo-tecsup.png' %}" style="width: 17%" alt="Logo">
             </a>
           <div class="d-flex text-white">
-            <a href="" class="px-2 text-white text-decoration-none">Mis eventos</a>
+            <a href="" class="px-2 text-white text-decoration-none">Mis eventos ( {{ cantidad_eventos_usuario }} )</a>/
+            <a href="{% url 'eventos:cerrar_sesion' %}" class="px-2 text-white text-decoration-none">Cerrar sesión</a>
           </div>
         </div>
     </nav>

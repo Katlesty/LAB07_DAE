@@ -12,5 +12,5 @@ def verificar_autenticacion(view_func):
                 return view_func(request, *args, **kwargs)
             except Usuario.DoesNotExist:
                 pass
-        return redirect('/iniciarsesion/')
+        return redirect('/eventos/iniciarsesion/')
     return wrapper
